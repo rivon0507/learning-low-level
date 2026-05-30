@@ -1,0 +1,18 @@
+
+hello:     file format elf64-x86-64
+
+Contents of section .text:
+ 401000 b8010000 00bf0100 000048be 00204000  ..........H.. @.
+ 401010 00000000 ba0e0000 000f05             ...........     
+Contents of section .data:
+ 402000 68656c6c 6f2c2077 6f726c64 210a      hello, world!.  
+
+Disassembly of section .text:
+
+0000000000401000 <_start>:
+  401000:	b8 01 00 00 00       	mov    eax,0x1
+  401005:	bf 01 00 00 00       	mov    edi,0x1
+  40100a:	48 be 00 20 40 00 00 	movabs rsi,0x402000
+  401011:	00 00 00 
+  401014:	ba 0e 00 00 00       	mov    edx,0xe
+  401019:	0f 05                	syscall
