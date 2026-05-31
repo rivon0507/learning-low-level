@@ -1,0 +1,120 @@
+
+test:     file format elf64-x86-64
+
+Contents of section .text:
+ 401000 48bf0020 40000000 0000e847 000000e8  H.. @......G....
+ 401010 71000000 488b3c25 02204000 e84d0000  q...H.<%. @..M..
+ 401020 00e85f00 0000bf60 e20100e8 60000000  .._....`....`...
+ 401030 e8500000 00bf0000 0000e801 00000090  .P..............
+ 401040 b83c0000 000f0548 31c0803c 07007405  .<.....H1..<..t.
+ 401050 48ffc0eb f5c3e8ec ffffff48 89c24889  H..........H..H.
+ 401060 febf0100 0000b801 0000000f 05c357ba  ..............W.
+ 401070 01000000 4889e6bf 01000000 b8010000  ....H...........
+ 401080 000f055f c3bf0a00 0000e8df ffffffc3  ..._............
+ 401090 55534889 e54883ec 204883e3 014889f8  USH..H.. H...H..
+ 4010a0 b90a0000 00488d75 f84831d2 48f7f148  .....H.u.H1.H..H
+ 4010b0 83c23048 ffce8816 48ffc348 85c075e9  ..0H....H..H..u.
+ 4010c0 b8010000 00bf0100 00004889 da0f0548  ..........H....H
+ 4010d0 89ec5b5d c34883ff 007d0f57 bf2d0000  ..[].H...}.W.-..
+ 4010e0 00e888ff ffff5f48 f7dfe8a1 ffffffc3  ......_H........
+Contents of section .data:
+ 402000 48656c6c 6f2c2077 6f726c64 2100      Hello, world!.  
+
+Disassembly of section .text:
+
+0000000000401000 <_start>:
+  401000:	48 bf 00 20 40 00 00 	movabs rdi,0x402000
+  401007:	00 00 00 
+  40100a:	e8 47 00 00 00       	call   401056 <print_string>
+  40100f:	e8 71 00 00 00       	call   401085 <print_newline>
+  401014:	48 8b 3c 25 02 20 40 	mov    rdi,QWORD PTR ds:0x402002
+  40101b:	00 
+  40101c:	e8 4d 00 00 00       	call   40106e <print_char>
+  401021:	e8 5f 00 00 00       	call   401085 <print_newline>
+  401026:	bf 60 e2 01 00       	mov    edi,0x1e260
+  40102b:	e8 60 00 00 00       	call   401090 <print_uint>
+  401030:	e8 50 00 00 00       	call   401085 <print_newline>
+  401035:	bf 00 00 00 00       	mov    edi,0x0
+  40103a:	e8 01 00 00 00       	call   401040 <exit>
+  40103f:	90                   	nop
+
+0000000000401040 <exit>:
+  401040:	b8 3c 00 00 00       	mov    eax,0x3c
+  401045:	0f 05                	syscall
+
+0000000000401047 <string_length>:
+  401047:	48 31 c0             	xor    rax,rax
+
+000000000040104a <string_length.loop>:
+  40104a:	80 3c 07 00          	cmp    BYTE PTR [rdi+rax*1],0x0
+  40104e:	74 05                	je     401055 <string_length.end>
+  401050:	48 ff c0             	inc    rax
+  401053:	eb f5                	jmp    40104a <string_length.loop>
+
+0000000000401055 <string_length.end>:
+  401055:	c3                   	ret
+
+0000000000401056 <print_string>:
+  401056:	e8 ec ff ff ff       	call   401047 <string_length>
+  40105b:	48 89 c2             	mov    rdx,rax
+  40105e:	48 89 fe             	mov    rsi,rdi
+  401061:	bf 01 00 00 00       	mov    edi,0x1
+  401066:	b8 01 00 00 00       	mov    eax,0x1
+  40106b:	0f 05                	syscall
+  40106d:	c3                   	ret
+
+000000000040106e <print_char>:
+  40106e:	57                   	push   rdi
+  40106f:	ba 01 00 00 00       	mov    edx,0x1
+  401074:	48 89 e6             	mov    rsi,rsp
+  401077:	bf 01 00 00 00       	mov    edi,0x1
+  40107c:	b8 01 00 00 00       	mov    eax,0x1
+  401081:	0f 05                	syscall
+  401083:	5f                   	pop    rdi
+  401084:	c3                   	ret
+
+0000000000401085 <print_newline>:
+  401085:	bf 0a 00 00 00       	mov    edi,0xa
+  40108a:	e8 df ff ff ff       	call   40106e <print_char>
+  40108f:	c3                   	ret
+
+0000000000401090 <print_uint>:
+  401090:	55                   	push   rbp
+  401091:	53                   	push   rbx
+  401092:	48 89 e5             	mov    rbp,rsp
+  401095:	48 83 ec 20          	sub    rsp,0x20
+  401099:	48 83 e3 01          	and    rbx,0x1
+  40109d:	48 89 f8             	mov    rax,rdi
+  4010a0:	b9 0a 00 00 00       	mov    ecx,0xa
+  4010a5:	48 8d 75 f8          	lea    rsi,[rbp-0x8]
+
+00000000004010a9 <print_uint.loop>:
+  4010a9:	48 31 d2             	xor    rdx,rdx
+  4010ac:	48 f7 f1             	div    rcx
+  4010af:	48 83 c2 30          	add    rdx,0x30
+  4010b3:	48 ff ce             	dec    rsi
+  4010b6:	88 16                	mov    BYTE PTR [rsi],dl
+  4010b8:	48 ff c3             	inc    rbx
+  4010bb:	48 85 c0             	test   rax,rax
+  4010be:	75 e9                	jne    4010a9 <print_uint.loop>
+  4010c0:	b8 01 00 00 00       	mov    eax,0x1
+  4010c5:	bf 01 00 00 00       	mov    edi,0x1
+  4010ca:	48 89 da             	mov    rdx,rbx
+  4010cd:	0f 05                	syscall
+  4010cf:	48 89 ec             	mov    rsp,rbp
+  4010d2:	5b                   	pop    rbx
+  4010d3:	5d                   	pop    rbp
+  4010d4:	c3                   	ret
+
+00000000004010d5 <print_int>:
+  4010d5:	48 83 ff 00          	cmp    rdi,0x0
+  4010d9:	7d 0f                	jge    4010ea <print_int.positive>
+  4010db:	57                   	push   rdi
+  4010dc:	bf 2d 00 00 00       	mov    edi,0x2d
+  4010e1:	e8 88 ff ff ff       	call   40106e <print_char>
+  4010e6:	5f                   	pop    rdi
+  4010e7:	48 f7 df             	neg    rdi
+
+00000000004010ea <print_int.positive>:
+  4010ea:	e8 a1 ff ff ff       	call   401090 <print_uint>
+  4010ef:	c3                   	ret
