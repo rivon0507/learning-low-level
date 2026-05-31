@@ -181,7 +181,7 @@ read_word:
     jge .not_fitting
     cmp rcx, rbx
     jge .add_null_term
-    mov rdi, [rdx + rcx]
+    mov dil, [rdx + rcx]
     call test_whitespace
     je .add_null_term
     inc rcx
