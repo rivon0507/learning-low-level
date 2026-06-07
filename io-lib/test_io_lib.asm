@@ -9,6 +9,8 @@ extern read_char
 extern read_word
 extern parse_uint
 extern parse_int
+extern string_equals
+extern string_copy
 
 section .data
 hello: db "Hello, world!", 0
@@ -23,7 +25,15 @@ t_your_number_is: db "[Your number is] ", 0
 t_parsed_chars: db " [Parsed chars] ", 0
 t_your_word_is: db "[Your word is] ", 0
 t_enter_a_number: db "[Enter a number]>", 0 
-t_enter_a_positive_number: db "[Enter a positive number]>", 0 
+t_enter_a_positive_number: db "[Enter a positive number]>", 0
+t_guess_the_word: db "[Guess the word]>", 0
+t_you_guessed_right: db "[You guessed right!]", 0xa, 0
+t_you_guessed_wrong: db "[You guessed wrong!]", 0xa, 0
+t_word_to_guess: db "supercalifragilistic", 0
+t_choose_number_0_24: db "[Choose a number between 0 and 24]>", 0
+t_number_lower_than_0: db "[THE NUMBER IS LOWER THAN 0]", 0xa, 0
+t_number_higher_than_24: db "[THE NUMBER IS HIGHER THAN 24]", 0xa, 0
+t_not_fitting: db "[NOT FITTING]", 0xa, 0
 
 section .text
 
@@ -129,10 +139,59 @@ _start:
     mov rdi, r12
     call print_uint
     call print_newline
-    jmp .end
+    jmp .end_read_int
 .no_word_read_3:
     lea rdi, [rel t_no_word_read]
     call print_string ; [NO WORD READ]
+.end_read_int:
+    lea rdi, [rel t_guess_the_word]
+    call print_string ; [Guess the word]>
+    lea rdi, [rsp]
+    mov rsi, 0x18
+    call read_word
+    lea rdi, [rel t_word_to_guess]
+    mov rsi, rax
+    call string_equals
+    test rax, rax
+    jz .different
+    lea rdi, [rel t_you_guessed_right]
+    call print_string
+    jmp .end_guess_word
+.different:
+    lea rdi, [rel t_you_guessed_wrong]
+    call print_string
+.end_guess_word:
+    lea rdi, [rel t_choose_number_0_24]
+    call print_string
+    lea rdi, [rsp]
+    mov rsi, 0x18
+    call read_word
+    mov rdi, rax
+    call parse_int
+    cmp rax, 24
+    jg .too_big
+    cmp rax, 0
+    jl .too_small
+    mov rdx, rax
+    lea rdi, [rel hello]
+    lea rsi, [rsp]
+    call string_copy
+    test rax, rax
+    jz .not_fitting
+    mov rdi, rax
+    call print_string
+    jmp .end
+.too_big:
+    lea rdi, [rel t_number_higher_than_24]
+    call print_string
+    jmp .end
+.too_small:
+    lea rdi, [rel t_number_lower_than_0]
+    call print_string
+    jmp .end
+.not_fitting:
+    lea rdi, [rel t_not_fitting]
+    call print_string
 .end:
     mov rsp, rbp
     pop rbp

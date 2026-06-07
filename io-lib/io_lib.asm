@@ -9,6 +9,8 @@ global read_char
 global read_word
 global parse_uint
 global parse_int
+global string_equals
+global string_copy
 
 section .text
 exit:
@@ -233,8 +235,49 @@ parse_int:
     test rbx, rbx
     jz .end ; skip signing
     neg rax
+    add rdx, 1
 .end:
     pop rdi
     pop rbx
     ret
 
+string_equals:
+    xor rcx, rcx
+.cmp_char:
+    mov byte al, [rdi + rcx]
+    cmp al, [rsi + rcx]
+    jne .different
+    test al, al
+    jz .same
+    inc rcx
+    jmp .cmp_char
+.different:
+    xor rax, rax
+    jmp .end
+.same:
+    mov rax, 0x1
+.end:
+    ret
+
+string_copy:
+    ; rdi: source, containing the null-terminated string to copy
+    ; rsi: destination buffer's pointer
+    ; rdx: destination buffer's size
+    call string_length
+    cmp rax, rdx
+    jge .not_fitting
+    xor rcx, rcx
+.copy_char:
+    cmp rcx, rax
+    jg .copy_done
+    mov byte dl, [rdi + rcx]
+    mov byte [rsi + rcx], dl
+    inc rcx
+    jmp .copy_char
+.copy_done:
+    mov rax, rsi
+    jmp .end
+.not_fitting:
+    mov rax, 0
+.end:
+    ret
