@@ -48,6 +48,14 @@ print_char:
     pop rdi
     ret
 
+print_int:
+    cmp rdi, 0
+    jge print_uint
+    push rdi
+    mov rdi, 0x2d
+    call print_char
+    pop rdi
+    neg rdi
 print_uint:
     push rbp
     push rbx
@@ -73,18 +81,6 @@ print_uint:
     mov rsp, rbp
     pop rbx
     pop rbp
-    ret
-
-print_int:
-    cmp rdi, 0
-    jge .positive
-    push rdi
-    mov rdi, 0x2d
-    call print_char
-    pop rdi
-    neg rdi
-.positive:
-    call print_uint
     ret
 
 read_char:
