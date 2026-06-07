@@ -36,6 +36,8 @@ print_string:
     syscall
     ret
 
+print_newline:
+    mov rdi, 10
 print_char:
     push rdi
     mov rdx, 1
@@ -44,11 +46,6 @@ print_char:
     mov rax, 1
     syscall
     pop rdi
-    ret
-
-print_newline:
-    mov rdi, 10
-    call print_char
     ret
 
 print_uint:
